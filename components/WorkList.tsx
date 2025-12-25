@@ -1,6 +1,7 @@
 "use client";
 import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { workImages } from "@/work_list_imgs/index";
 
 const projects = [
     {
@@ -12,11 +13,7 @@ const projects = [
         link: "#",
         media: {
             video: "",
-            images: [
-                "/content-creation.png",
-                "/content-creation.png",
-                "/content-creation.png",
-            ]
+            images: workImages.content
         }
     },
     {
@@ -28,11 +25,7 @@ const projects = [
         link: "#",
         media: {
             video: "",
-            images: [
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg", // Placeholder
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-            ]
+            images: workImages.webDev
         }
     },
     {
@@ -44,11 +37,7 @@ const projects = [
         link: "#",
         media: {
             video: "",
-            images: [
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg", // Placeholder
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-            ]
+            images: workImages.seo
         }
     },
     {
@@ -60,11 +49,7 @@ const projects = [
         link: "#",
         media: {
             video: "",
-            images: [
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg", // Placeholder
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-            ]
+            images: workImages.branding
         }
     },
     {
@@ -76,11 +61,7 @@ const projects = [
         link: "#",
         media: {
             video: "",
-            images: [
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg", // Placeholder
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-                "https://assets-global.website-files.com/6334198f239547d0f9cd84b3/63455d9694b8e288eb626601_Cula.jpg",
-            ]
+            images: workImages.digitalMarketing
         }
     },
 ];
@@ -218,17 +199,20 @@ export const WorkList = () => {
                                             {/* Images */}
                                             <div className="col-span-1 md:col-span-6 grid grid-cols-3 gap-4">
                                                 {project.media.images.map(
-                                                    (img: string, i: number) => (
-                                                        <motion.img
-                                                            key={i}
-                                                            src={img}
-                                                            alt=""
-                                                            className="w-full h-32 md:h-full object-cover rounded-xl bg-zinc-800"
-                                                            initial={{ opacity: 0, y: 20 }}
-                                                            animate={{ opacity: 1, y: 0 }}
-                                                            transition={{ delay: 0.2 + (i * 0.1) }}
-                                                        />
-                                                    )
+                                                    (img: any, i: number) => {
+                                                        const src = typeof img === "string" ? img : img?.src || img?.default || "";
+                                                        return (
+                                                            <motion.img
+                                                                key={i}
+                                                                src={src}
+                                                                alt=""
+                                                                className="w-full h-32 md:h-full object-cover rounded-xl bg-zinc-800"
+                                                                initial={{ opacity: 0, y: 20 }}
+                                                                animate={{ opacity: 1, y: 0 }}
+                                                                transition={{ delay: 0.2 + i * 0.1 }}
+                                                            />
+                                                        );
+                                                    }
                                                 )}
                                             </div>
                                         </div>
