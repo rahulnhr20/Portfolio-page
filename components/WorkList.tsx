@@ -1,7 +1,8 @@
-"use client";
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { workImages } from "@/work_list_imgs/index";
+import { Carousel } from "./Carousel";
+import { StaticImageData } from "next/image";
 
 const projects = [
     {
@@ -68,30 +69,29 @@ const projects = [
 
 export const WorkList = () => {
     const [hoverIndex, setHoverIndex] = useState<number | null>(null);
+    const hoverTimeout = useRef<NodeJS.Timeout | null>(null);
+
+    const handleMouseEnter = (index: number) => {
+        if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+        hoverTimeout.current = setTimeout(() => {
+            setHoverIndex(index);
+        }, 1000);
+    };
+
+    const handleMouseLeave = () => {
+        if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
+        setHoverIndex(null);
+    };
 
     return (
-        <section className="py-20">
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-20">
-                {/* Header content moved to page.tsx for better animation control, or we can keep it here with animations. 
-                    The plan said page.tsx handles the main header. Let's make this just the list. 
-                    Actually, the user sees "SELECTED WORK" in the plan for page.tsx. 
-                    WorkList has "work." as a header. I will remove the header from WorkList to avoid duplication if I put it in page.tsx 
-                    OR I will adapt WorkList to just be the list. 
-                    
-                    Wait, the plan says:
-                    page.tsx: "SELECTED WORK" header with ScrambleText.
-                    WorkList.tsx: "Container for the list of projects".
-                    
-                    So I should remove the header from WorkList.tsx and just keep the list.
-                */}
-            </div>
+        <section className="pt-0 pb-5">
 
             <div className="w-full">
                 {projects.map((project, index) => (
                     <motion.div
                         key={index}
-                        onMouseEnter={() => setHoverIndex(index)}
-                        onMouseLeave={() => setHoverIndex(null)}
+                        onMouseEnter={() => handleMouseEnter(index)}
+                        onMouseLeave={handleMouseLeave}
                         className="border-b border-white/15 cursor-pointer"
                         animate={{
                             backgroundColor:
@@ -103,13 +103,13 @@ export const WorkList = () => {
                         <motion.div
                             initial={false}
                             animate={{
-                                // In the original request, opacity goes to 0 on hover, but we want to arguably keep it visible 
-                                // or follow the specific design where the row content might disappear to be replaced by the expanded content.
-                                // The user code suggests opacity: hoverIndex === index ? 0 : 1.
                                 opacity: hoverIndex === index ? 0 : 1,
+                                height: hoverIndex === index ? 0 : "auto",
+                                paddingTop: hoverIndex === index ? 0 : "1.5rem", // py-6 = 1.5rem
+                                paddingBottom: hoverIndex === index ? 0 : "1.5rem",
                             }}
-                            transition={{ duration: 0.25, ease: "easeOut" }}
-                            className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 px-4 md:px-16 overflow-hidden py-6"
+                            transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
+                            className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 px-4 md:px-16 overflow-hidden"
                         >
                             <h3 className="col-span-1 md:col-span-3 text-2xl font-medium">
                                 {project.title}
@@ -135,13 +135,13 @@ export const WorkList = () => {
                                     animate={{ height: "auto", opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
                                     transition={{
-                                        duration: 0.4,
-                                        ease: [0.16, 1, 0.3, 1], // Custom bezier for smooth expanding
+                                        duration: 0.7,
+                                        ease: [0.16, 1, 0.3, 1],
                                     }}
                                     className="overflow-hidden px-4 md:px-16"
                                 >
                                     <div
-                                        className="pb-12 space-y-10"
+                                        className="py-12 space-y-10"
                                     >
                                         {/* ================= TEXT ROW (Expanded) ================= */}
                                         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
@@ -177,44 +177,50 @@ export const WorkList = () => {
                                         </div>
 
                                         {/* ================= MEDIA ROW ================= */}
-                                        <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
-                                            {/* Video */}
-                                            <div className="col-span-1 md:col-span-6 h-64 md:h-80 bg-black/20 rounded-xl overflow-hidden relative">
-                                                {/* Fallback pattern if no video */}
-                                                <div className="absolute inset-0 flex items-center justify-center text-white/20">
-                                                    Video Preview
-                                                </div>
-                                                {project.media.video && (
-                                                    <video
-                                                        src={project.media.video}
-                                                        autoPlay
-                                                        muted
-                                                        loop
-                                                        playsInline
-                                                        className="w-full h-full object-cover"
-                                                    />
-                                                )}
-                                            </div>
-
-                                            {/* Images */}
-                                            <div className="col-span-1 md:col-span-6 grid grid-cols-3 gap-4">
-                                                {project.media.images.map(
-                                                    (img: any, i: number) => {
-                                                        const src = typeof img === "string" ? img : img?.src || img?.default || "";
-                                                        return (
-                                                            <motion.img
-                                                                key={i}
-                                                                src={src}
-                                                                alt=""
-                                                                className="w-full h-32 md:h-full object-cover rounded-xl bg-zinc-800"
-                                                                initial={{ opacity: 0, y: 20 }}
-                                                                animate={{ opacity: 1, y: 0 }}
-                                                                transition={{ delay: 0.2 + i * 0.1 }}
+                                        <div className="w-full">
+                                            {project.title === "Content Creation" ? (
+                                                <div className="grid grid-cols-1 md:grid-cols-12 gap-8">
+                                                    {/* Video */}
+                                                    <div className="col-span-1 md:col-span-6 h-64 md:h-80 bg-black/20 rounded-xl overflow-hidden relative">
+                                                        {/* Fallback pattern if no video */}
+                                                        <div className="absolute inset-0 flex items-center justify-center text-white/20">
+                                                            Video Preview
+                                                        </div>
+                                                        {project.media.video && (
+                                                            <video
+                                                                src={project.media.video}
+                                                                autoPlay
+                                                                muted
+                                                                loop
+                                                                playsInline
+                                                                className="w-full h-full object-cover"
                                                             />
-                                                        );
-                                                    }
-                                                )}
-                                            </div>
+                                                        )}
+                                                    </div>
+
+                                                    {/* Images */}
+                                                    <div className="col-span-1 md:col-span-6 grid grid-cols-3 gap-4">
+                                                        {project.media.images.map(
+                                                            (img: StaticImageData | string, i: number) => {
+                                                                const src = typeof img === "string" ? img : img.src;
+                                                                return (
+                                                                    <motion.img
+                                                                        key={i}
+                                                                        src={src}
+                                                                        alt=""
+                                                                        className="w-full h-32 md:h-full object-cover rounded-xl bg-zinc-800"
+                                                                        initial={{ opacity: 0, y: 20 }}
+                                                                        animate={{ opacity: 1, y: 0 }}
+                                                                        transition={{ delay: 0.2 + i * 0.1 }}
+                                                                    />
+                                                                );
+                                                            }
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <Carousel images={project.media.images} />
+                                            )}
                                         </div>
                                     </div>
                                 </motion.div>
