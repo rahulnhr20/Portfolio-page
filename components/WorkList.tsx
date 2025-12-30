@@ -75,7 +75,7 @@ export const WorkList = () => {
         if (hoverTimeout.current) clearTimeout(hoverTimeout.current);
         hoverTimeout.current = setTimeout(() => {
             setHoverIndex(index);
-        }, 1000);
+        }, 300); // Adjust this value to change the delay (in ms)
     };
 
     const handleMouseLeave = () => {
@@ -109,7 +109,7 @@ export const WorkList = () => {
                                 paddingBottom: hoverIndex === index ? 0 : "1.5rem",
                             }}
                             transition={{ duration: 0.5, ease: [0.25, 1, 0.5, 1] }}
-                            className="w-full grid grid-cols-1 md:grid-cols-12 gap-6 px-4 md:px-16 overflow-hidden"
+                            className="w-full max-w-[1800px] 2xl:max-w-[90vw] mx-auto grid grid-cols-1 md:grid-cols-12 gap-6 px-4 md:px-16 overflow-hidden"
                         >
                             <h3 className="col-span-1 md:col-span-3 text-2xl font-medium">
                                 {project.title}
@@ -141,7 +141,7 @@ export const WorkList = () => {
                                     className="overflow-hidden px-4 md:px-16"
                                 >
                                     <div
-                                        className="py-12 space-y-10"
+                                        className="py-12 space-y-10 max-w-[1800px] 2xl:max-w-[90vw] mx-auto"
                                     >
                                         {/* ================= TEXT ROW (Expanded) ================= */}
                                         <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
